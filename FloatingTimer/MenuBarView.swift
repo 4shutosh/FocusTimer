@@ -103,14 +103,6 @@ struct MenuBarView: View {
                     Text("Saved Timers")
                         .font(.headline)
                     Spacer()
-                    Button(action: {
-                        PreferencesWindowController.showWindow()
-                    }) {
-                        Image(systemName: "pencil")
-                            .font(.caption)
-                    }
-                    .buttonStyle(.borderless)
-                    .help("Edit saved timers")
                 }
                 .padding(.horizontal)
                 

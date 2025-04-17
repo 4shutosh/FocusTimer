@@ -16,8 +16,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
-    
-    @objc func showPreferencesWindow(_ sender: Any?) {
-        PreferencesWindowController.showWindow()
-    }
 }

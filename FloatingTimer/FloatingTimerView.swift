@@ -83,3 +83,7 @@ struct FloatingTimerView: View {
         }
     }
 }
+
+#Preview {
+    FloatingTimerView(timerManager: TimerManager())
+}
