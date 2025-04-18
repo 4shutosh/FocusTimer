@@ -85,6 +85,7 @@ struct MenuBarView: View {
                     .buttonStyle(.borderless)
                     
                     Button(action: {
+                        timerManager.toggleFloatingWindow()
                         timerManager.stopTimer()
                     }) {
                         Image(systemName: "xmark.circle")
