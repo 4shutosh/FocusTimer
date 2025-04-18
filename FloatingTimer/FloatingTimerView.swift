@@ -8,7 +8,6 @@ struct FloatingTimerView: View {
     
     private let customGreen = Color("66BB6A")
   
-    // Define custom fonts with exact font names
     private let fontTitle = Font.custom("Oxygen-Regular", size: 24)
     private let fontSubtitle = Font.custom("Oxygen-Light", size: 16)
     
@@ -40,7 +39,7 @@ struct FloatingTimerView: View {
                                 .padding(.top, 2)
                                 .frame(alignment: .leading)
                             
-                            Spacer(minLength: 100) // Ensure space for buttons
+                            Spacer(minLength: 60) // Ensure space for buttons
                         }
                         
                         HStack(alignment: .lastTextBaseline, spacing: 2) {
@@ -78,12 +77,21 @@ struct FloatingTimerView: View {
                                     timerManager.stopTimer()
                                 }, imageIcon: "checkmark")
                                 .transition(.opacity)
+                                
+                                ButtonControl(action: {
+                                    timerManager.toggleFloatingWindow()
+                                }, imageIcon: "eye.slash")
+                                .transition(.opacity)
 
                                 
                                 ButtonControl(action: {
                                     timerManager.toggleTimer()
                                 }, imageIcon: timerManager.isPaused ? "play" : "pause")
                             }
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(bgColor)
+                            )
                         } else {
                             // Only play/pause button when not hovering
                             ButtonControl(action: {
@@ -92,7 +100,7 @@ struct FloatingTimerView: View {
                         }
                     }
                     .onHover { hovering in
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(.easeInOut(duration: 0.1)) {
                             showControls = hovering
                         }
                     }
@@ -184,12 +192,10 @@ private struct ButtonControl: View {
     @State private var isHovering = false
     @Environment(\.colorScheme) var colorScheme
     
-    // Define a constant for the gray color (#9E9E9E)
     private let grayColor = Color("9E9E9E")
     
     var body: some View {
         HStack(spacing: 0) {
-            // 1dp width vertical divider
             Rectangle()
                 .frame(width: 1)
                 .foregroundColor(Color.gray.opacity(0.2))

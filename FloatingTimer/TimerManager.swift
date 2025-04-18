@@ -27,10 +27,16 @@ class TimerManager: ObservableObject {
     }
     
     func startNewTimer(name: String, minutes: Int) {
+        // Validate that the timer is not more than 4 hours (240 minutes)
+        let validMinutes = min(minutes, 240)
+        
         stopTimer()
         
-        timerName = name
-        totalSeconds = minutes * 60
+        // Enforce maximum length for timer name (50 characters)
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        timerName = trimmedName.count > 50 ? String(trimmedName.prefix(50)) : trimmedName
+        
+        totalSeconds = validMinutes * 60
         remainingSeconds = totalSeconds
         isRunning = true
         isPaused = false
@@ -111,8 +117,48 @@ class TimerManager: ObservableObject {
     }
     
     func shortTimeString() -> String {
+        let totalSeconds = remainingSeconds
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        
+        var result = ""
+        
+        if hours > 0 {
+            result += "\(hours)h "
+        }
+        
+        if minutes > 0 || (hours > 0 && seconds > 0) {
+            result += "\(minutes)m "
+        }
+        
+        if seconds > 0 || totalSeconds == 0 {
+            result += "\(seconds)s"
+        }
+        
+        return result.trimmingCharacters(in: .whitespaces)
+    }
+    
+    func menuBarTimeString() -> String {
         let minutes = remainingSeconds / 60
-        return "\(minutes)m"
+        let seconds = remainingSeconds % 60
+        
+        // If time is more than a minute, exclude seconds
+        if minutes > 0 {
+            let hours = minutes / 60
+            let mins = minutes % 60
+            
+            if hours > 0 {
+                // Format as "Xh Ym"
+                return String(format: "%dh %dm", hours, mins)
+            } else {
+                // Just show minutes
+                return String(format: "%dm", mins)
+            }
+        } else {
+            // For less than a minute, show seconds
+            return String(format: "%ds", seconds)
+        }
     }
     
     // Handle floating window

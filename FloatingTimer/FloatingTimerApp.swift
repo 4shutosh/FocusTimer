@@ -24,8 +24,7 @@ struct FloatingTimerApp: App {
         MenuBarExtra {
             MenuBarView(timerManager: timerManager)
         } label: {
-            if timerManager.isRunning {
-                // Show timer indicator when running
+            if timerManager.isRunning && !timerManager.showFloatingTimer {
                 HStack(spacing: 2) {
                     Image(systemName: "timer")
                     Text(timerManager.shortTimeString())
@@ -37,7 +36,6 @@ struct FloatingTimerApp: App {
         }
         .menuBarExtraStyle(.window)
         
-        // We'll handle window creation manually rather than using WindowGroup
         Settings {
             EmptyView()
         }
