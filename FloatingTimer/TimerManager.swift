@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import AppKit
 import UserNotifications
+import AVFoundation
 
 class TimerManager: ObservableObject {
     @Published var timerName: String = ""
@@ -17,9 +18,11 @@ class TimerManager: ObservableObject {
     @Published var isRunning: Bool = false
     @Published var isPaused: Bool = false
     @Published var showFloatingTimer: Bool = false
+    @Published var isCompleted: Bool = false
     
     private var timer: Timer?
     private var floatingWindow: NSWindow?
+    private var player: AVAudioPlayer?
     
     var progress: Double {
         if totalSeconds == 0 { return 0 }
@@ -40,6 +43,7 @@ class TimerManager: ObservableObject {
         remainingSeconds = totalSeconds
         isRunning = true
         isPaused = false
+        isCompleted = false
         showFloatingTimer = true
         
         print("Starting timer and showing floating window")
@@ -79,6 +83,7 @@ class TimerManager: ObservableObject {
         isRunning = false
         isPaused = false
         remainingSeconds = 0
+        isCompleted = false
     }
     
     private func startTimer() {
@@ -96,8 +101,64 @@ class TimerManager: ObservableObject {
     }
     
     private func timerCompleted() {
-        stopTimer()
+        timer?.invalidate()
+        isRunning = false
+        isPaused = false
+        isCompleted = true
+        playGongSound()
         showNotification()
+    }
+    
+    private func playGongSound() {
+        // First try to load from bundle
+        if let soundURL = Bundle.main.url(forResource: "gong", withExtension: "mp3") {
+            playSound(from: soundURL)
+            return
+        }
+        
+        // If not in bundle, try to load from the Resources directory
+        let resourcesPath = Bundle.main.bundlePath + "/Resources/gong.mp3"
+        if FileManager.default.fileExists(atPath: resourcesPath) {
+            playSound(from: URL(fileURLWithPath: resourcesPath))
+            return
+        }
+        
+        // If not found, try to load from a fixed URL as fallback
+        if let url = URL(string: "https://freesound.org/data/previews/41/41169_187255-lq.mp3") {
+            // Download and play
+            let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+                guard let self = self, 
+                      let data = data, 
+                      error == nil else {
+                    print("Failed to download sound: \(error?.localizedDescription ?? "unknown error")")
+                    return
+                }
+                
+                // Create a temporary file
+                let tempDir = FileManager.default.temporaryDirectory
+                let tempFile = tempDir.appendingPathComponent("gong.mp3")
+                
+                do {
+                    try data.write(to: tempFile)
+                    self.playSound(from: tempFile)
+                } catch {
+                    print("Failed to write temp file: \(error)")
+                }
+            }
+            task.resume()
+        } else {
+            print("Could not create URL for gong sound")
+        }
+    }
+    
+    private func playSound(from url: URL) {
+        do {
+            player = try AVAudioPlayer(contentsOf: url)
+            player?.prepareToPlay()
+            player?.play()
+        } catch {
+            print("Could not play sound: \(error)")
+        }
     }
     
     private func showNotification() {
@@ -222,6 +283,9 @@ class TimerManager: ObservableObject {
         if let window = floatingWindow {
             window.close()
             floatingWindow = nil
+        }
+        if isCompleted {
+            player?.stop()
         }
     }
 }

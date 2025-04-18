@@ -8,6 +8,7 @@
 import SwiftUI
 import AppKit
 import CoreText
+import AVFoundation
 
 @main
 struct FloatingTimerApp: App {
@@ -17,6 +18,10 @@ struct FloatingTimerApp: App {
     init() {
         // Register custom fonts
         registerFonts()
+        // Check if gong sound exists and log if not found
+        if Bundle.main.url(forResource: "gong", withExtension: "mp3") == nil {
+            print("WARNING: Gong sound file not found in bundle")
+        }
     }
     
     var body: some Scene {
@@ -50,16 +55,10 @@ struct FloatingTimerApp: App {
             guard let fontURL = Bundle.main.url(forResource: fontName, withExtension: "ttf"),
                   let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
                   let font = CGFont(fontDataProvider) else {
-                print("Failed to load font: \(fontName)")
                 continue
             }
             
             var error: Unmanaged<CFError>?
-            if !CTFontManagerRegisterGraphicsFont(font, &error) {
-                print("Error registering font: \(fontName)")
-            } else {
-                print("Successfully registered font: \(fontName)")
-            }
         }
     }
 }

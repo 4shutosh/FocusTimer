@@ -20,6 +20,7 @@ struct MenuBarView: View {
     private let fontTitle = Font.custom("Oxygen-Regular", size: 14)
     private let fontSubtitle = Font.custom("Oxygen-Light", size: 12)
     private let customGreen = Color("66BB6A")
+    private let customRed = Color.red
     
     // Maximum length for timer name
     private let maxTimerNameLength = 50
@@ -185,7 +186,7 @@ struct MenuBarView: View {
                         HStack(alignment: .lastTextBaseline, spacing: 2) {
                             Text(timerManager.shortTimeString())
                                 .font(fontTitle)
-                                .foregroundColor(timerManager.isPaused ? Color.orange : customGreen)
+                                .foregroundColor(timerColorState())
                                 .lineLimit(1)
                             
                             // Total time in gray
@@ -199,12 +200,21 @@ struct MenuBarView: View {
                     Spacer()
                     
                     HStack(spacing: 8) {
-                        Button(action: {
-                            timerManager.toggleTimer()
-                        }) {
-                            Image(systemName: timerManager.isPaused ? "play.fill" : "pause.fill")
+                        if !timerManager.isCompleted {
+                            Button(action: {
+                                timerManager.toggleTimer()
+                            }) {
+                                Image(systemName: timerManager.isPaused ? "play.fill" : "pause.fill")
+                            }
+                            .buttonStyle(.borderless)
+                        } else {
+                            Button(action: {
+                                timerManager.stopTimer()
+                            }) {
+                                Image(systemName: "checkmark.circle")
+                            }
+                            .buttonStyle(.borderless)
                         }
-                        .buttonStyle(.borderless)
                         
                         Button(action: {
                             timerManager.toggleFloatingWindow()
@@ -324,6 +334,17 @@ struct MenuBarView: View {
         }
         .padding(.vertical, 8)
         .frame(width: 300)
+    }
+    
+    // Helper function to determine timer color state
+    private func timerColorState() -> Color {
+        if timerManager.isCompleted {
+            return customRed
+        } else if timerManager.isPaused {
+            return Color.orange
+        } else {
+            return customGreen
+        }
     }
     
     private func saveTimer() {

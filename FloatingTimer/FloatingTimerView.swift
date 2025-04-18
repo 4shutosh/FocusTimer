@@ -7,6 +7,7 @@ struct FloatingTimerView: View {
     @State private var showControls: Bool = false
     
     private let customGreen = Color("66BB6A")
+    private let customRed = Color.red
   
     private let fontTitle = Font.custom("Oxygen-Regular", size: 24)
     private let fontSubtitle = Font.custom("Oxygen-Light", size: 16)
@@ -45,7 +46,7 @@ struct FloatingTimerView: View {
                         HStack(alignment: .lastTextBaseline, spacing: 2) {
                             Text(formatCurrentTime())
                                 .font(fontTitle)
-                                .foregroundColor(timerManager.isPaused ? Color.orange : customGreen)
+                                .foregroundColor(timerColorState())
                                 .lineLimit(1)
                             
                             // Total time in gray
@@ -72,11 +73,13 @@ struct FloatingTimerView: View {
                                 .transition(.opacity)
                                 
                                 // Close button
-                                ButtonControl(action: {
-                                    timerManager.toggleFloatingWindow()
-                                    timerManager.stopTimer()
-                                }, imageIcon: "checkmark")
-                                .transition(.opacity)
+                                if !timerManager.isCompleted {
+                                    ButtonControl(action: {
+                                        timerManager.toggleFloatingWindow()
+                                        timerManager.stopTimer()
+                                    }, imageIcon: "checkmark")
+                                    .transition(.opacity)
+                                }
                                 
                                 ButtonControl(action: {
                                     timerManager.toggleFloatingWindow()
@@ -84,9 +87,16 @@ struct FloatingTimerView: View {
                                 .transition(.opacity)
 
                                 
-                                ButtonControl(action: {
-                                    timerManager.toggleTimer()
-                                }, imageIcon: timerManager.isPaused ? "play" : "pause")
+                                if !timerManager.isCompleted {
+                                    ButtonControl(action: {
+                                        timerManager.toggleTimer()
+                                    }, imageIcon: timerManager.isPaused ? "play" : "pause")
+                                } else {
+                                    ButtonControl(action: {
+                                        timerManager.closeFloatingWindow()
+                                        timerManager.stopTimer()
+                                    }, imageIcon: "checkmark")
+                                }
                             }
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
@@ -94,9 +104,15 @@ struct FloatingTimerView: View {
                             )
                         } else {
                             // Only play/pause button when not hovering
-                            ButtonControl(action: {
-                                timerManager.toggleTimer()
-                            }, imageIcon: timerManager.isPaused ? "play" : "pause")
+                            if !timerManager.isCompleted {
+                                ButtonControl(action: {
+                                    timerManager.toggleTimer()
+                                }, imageIcon: timerManager.isPaused ? "play" : "pause")
+                            } else {
+                                ButtonControl(action: {
+                                    timerManager.stopTimer()
+                                }, imageIcon: "checkmark")
+                            }
                         }
                     }
                     .onHover { hovering in
@@ -119,7 +135,7 @@ struct FloatingTimerView: View {
                         .frame(height: 4)
                     
                     Rectangle()
-                        .foregroundColor(timerManager.isPaused ? Color.orange : customGreen)
+                        .foregroundColor(progressBarColor())
                         .frame(width: geometry.size.width * (1.0 - timerManager.progress), height: 4)
                 }
             }
@@ -138,6 +154,28 @@ struct FloatingTimerView: View {
             withAnimation {
                 opacity = isHovering ? 1.0 : 0.7
             }
+        }
+    }
+    
+    // Helper function to determine timer color state
+    private func timerColorState() -> Color {
+        if timerManager.isCompleted {
+            return customRed
+        } else if timerManager.isPaused {
+            return Color.orange
+        } else {
+            return customGreen
+        }
+    }
+    
+    // Helper function to determine progress bar color
+    private func progressBarColor() -> Color {
+        if timerManager.isCompleted {
+            return customRed
+        } else if timerManager.isPaused {
+            return Color.orange
+        } else {
+            return customGreen
         }
     }
     
