@@ -7,11 +7,17 @@
 
 import SwiftUI
 import AppKit
+import CoreText
 
 @main
 struct FloatingTimerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var timerManager = TimerManager()
+    
+    init() {
+        // Register custom fonts
+        registerFonts()
+    }
     
     var body: some Scene {
         // This makes it a menu bar app
@@ -34,6 +40,28 @@ struct FloatingTimerApp: App {
         // We'll handle window creation manually rather than using WindowGroup
         Settings {
             EmptyView()
+        }
+    }
+    
+    // Register the custom fonts
+    private func registerFonts() {
+        // Font file names
+        let fontNames = ["Oxygen-Regular", "Oxygen-Bold", "Oxygen-Light"]
+        
+        for fontName in fontNames {
+            guard let fontURL = Bundle.main.url(forResource: fontName, withExtension: "ttf"),
+                  let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
+                  let font = CGFont(fontDataProvider) else {
+                print("Failed to load font: \(fontName)")
+                continue
+            }
+            
+            var error: Unmanaged<CFError>?
+            if !CTFontManagerRegisterGraphicsFont(font, &error) {
+                print("Error registering font: \(fontName)")
+            } else {
+                print("Successfully registered font: \(fontName)")
+            }
         }
     }
 }

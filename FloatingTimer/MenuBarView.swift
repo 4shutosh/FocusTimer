@@ -10,8 +10,8 @@ import AppKit
 
 struct MenuBarView: View {
     @ObservedObject var timerManager: TimerManager
-    @State private var newTimerName: String = "Focus Time"
-    @State private var newTimerDuration: Int = 25 // 25 minutes
+    @State private var newTimerName: String = "do the thing"
+    @State private var newTimerDuration: Int = 25
     @AppStorage("savedTimers") private var savedTimersData: Data = Data()
     
     private var savedTimers: [SavedTimer] {
@@ -60,11 +60,11 @@ struct MenuBarView: View {
             // Current timer status
             if timerManager.isRunning {
                 HStack {
-                    Text(timerManager.timerName)
+                    Text(timerManager.timerName.isEmpty ? "focus" : timerManager.timerName)
                         .fontWeight(.medium)
                         .lineLimit(1)
                         .truncationMode(.tail)
-                        .help(timerManager.timerName)
+                        .help(timerManager.timerName.isEmpty ? "focus" : timerManager.timerName)
                     Spacer()
                     Text(timerManager.timeString())
                         .monospacedDigit()
@@ -78,7 +78,6 @@ struct MenuBarView: View {
                     .buttonStyle(.borderless)
                     
                     Button(action: {
-                        print("Floating window button clicked")
                         timerManager.toggleFloatingWindow()
                     }) {
                         Image(systemName: timerManager.showFloatingTimer ? "rectangle.on.rectangle.slash" : "rectangle.on.rectangle")
@@ -110,7 +109,7 @@ struct MenuBarView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(savedTimers) { timer in
                             HStack {
-                                Text(timer.name)
+                                Text(timer.name.isEmpty ? "focus" : timer.name)
                                     .lineLimit(1)
                                     .truncationMode(.tail)
                                     .help(timer.name)

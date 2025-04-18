@@ -117,20 +117,16 @@ class TimerManager: ObservableObject {
     
     // Handle floating window
     func toggleFloatingWindow() {
-        print("Toggle floating window called")
         showFloatingTimer.toggle()
         
         if showFloatingTimer {
-            print("Showing floating window")
             createAndShowFloatingWindow()
         } else {
-            print("Hiding floating window")
             closeFloatingWindow()
         }
     }
     
     func createAndShowFloatingWindow() {
-        print("Creating floating window programmatically")
         
         // Close existing window if it exists
         closeFloatingWindow()
@@ -174,13 +170,10 @@ class TimerManager: ObservableObject {
         
         // Store reference to window
         self.floatingWindow = window
-        
-        print("Window created and should be visible")
     }
     
     func closeFloatingWindow() {
         if let window = floatingWindow {
-            print("Closing existing floating window")
             window.close()
             floatingWindow = nil
         }
