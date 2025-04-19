@@ -11,13 +11,19 @@ A PIP style timer window for macOS, inspired from sunsama.
   - The timer turning red can imply one of two things: either you were not efficient, or you didn't estimate the time correctly, disrupting your schedule.
 - Upon finishing each timer state, it plays a series of very gentle gong sounds.
 - the opacity is dynamic so that you can see the objects behind the window, you can click on the title to make it more transparent
+- The maximum time allowed for a task is 4hr. I don't belive you can focus for more than 4 hours straight. Take breaks and keep task meanings as concise as possible. 
 
 ---
 
 ### How to use? 
 
-- Download the latest version from [here](https://github.com/4shutosh/FocusTimer/releases/download/v1.0/FloatingTimerV1.zip). 
+- Download the latest version from [here](https://github.com/4shutosh/FocusTimer/releases/download/v1.0/FloatingTimer.v1.zip). 
 - Extract & Drop it into your Applications folder
 - Open it
 - You'll see a timer icon at the top of your menu bar
 - Set a name and time for the action
+
+--- 
+
+### Demo
+![video](/demo.mp4)
