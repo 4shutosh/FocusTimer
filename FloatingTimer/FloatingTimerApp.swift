@@ -52,13 +52,13 @@ struct FloatingTimerApp: App {
         let fontNames = ["Oxygen-Regular", "Oxygen-Bold", "Oxygen-Light"]
         
         for fontName in fontNames {
-            guard let fontURL = Bundle.main.url(forResource: fontName, withExtension: "ttf"),
-                  let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
-                  let font = CGFont(fontDataProvider) else {
-                continue
+            if let fontURL = Bundle.main.url(forResource: fontName, withExtension: "ttf"),
+               let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
+               let font = CGFont(fontDataProvider) {
+                
+                var error: Unmanaged<CFError>?
+                CTFontManagerRegisterGraphicsFont(font, &error)
             }
-            
-            var error: Unmanaged<CFError>?
         }
     }
 }

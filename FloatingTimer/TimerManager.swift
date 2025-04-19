@@ -19,10 +19,15 @@ class TimerManager: ObservableObject {
     @Published var isPaused: Bool = false
     @Published var showFloatingTimer: Bool = false
     @Published var isCompleted: Bool = false
+    @Published var overTimeSeconds: Int = 0
+    @Published var overtimeExceeded: Bool = false
     
     private var timer: Timer?
+    private var overtimeTimer: Timer?
     private var floatingWindow: NSWindow?
     private var player: AVAudioPlayer?
+    
+    private let timerOvertimeThreshold = 30 // 5 minutes in seconds
     
     var progress: Double {
         if totalSeconds == 0 { return 0 }
@@ -41,9 +46,11 @@ class TimerManager: ObservableObject {
         
         totalSeconds = validMinutes * 60
         remainingSeconds = totalSeconds
+        overTimeSeconds = 0
         isRunning = true
         isPaused = false
         isCompleted = false
+        overtimeExceeded = false
         showFloatingTimer = true
         
         print("Starting timer and showing floating window")
@@ -73,6 +80,14 @@ class TimerManager: ObservableObject {
     
     func resetTimer() {
         remainingSeconds = totalSeconds
+        overTimeSeconds = 0
+        isCompleted = false
+        overtimeExceeded = false
+        
+        overtimeTimer?.invalidate()
+        overtimeTimer = nil
+        
+        player?.stop()
         if !isPaused {
             startTimer()
         }
@@ -80,10 +95,13 @@ class TimerManager: ObservableObject {
     
     func stopTimer() {
         timer?.invalidate()
+        overtimeTimer?.invalidate()
         isRunning = false
         isPaused = false
         remainingSeconds = 0
+        overTimeSeconds = 0
         isCompleted = false
+        overtimeExceeded = false
     }
     
     private func startTimer() {
@@ -100,11 +118,33 @@ class TimerManager: ObservableObject {
         }
     }
     
+    private func startOvertimeTimer() {
+        overtimeTimer?.invalidate()
+        
+        overtimeTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            self.overTimeSeconds += 1
+            
+            // Check if overtime reached 5 minutes (totalSeconds + 5 minutes in seconds)
+            if !self.overtimeExceeded && 
+               (self.overTimeSeconds - self.totalSeconds) >= self.timerOvertimeThreshold {
+                self.overtimeExceeded = true
+                self.playGongSound()
+            }
+        }
+    }
+    
     private func timerCompleted() {
         timer?.invalidate()
         isRunning = false
         isPaused = false
         isCompleted = true
+        overTimeSeconds = totalSeconds
+        overtimeExceeded = false
+        
+        // Start counting overtime
+        startOvertimeTimer()
+        
         playGongSound()
         showNotification()
     }
@@ -201,24 +241,46 @@ class TimerManager: ObservableObject {
     }
     
     func menuBarTimeString() -> String {
-        let minutes = remainingSeconds / 60
-        let seconds = remainingSeconds % 60
-        
-        // If time is more than a minute, exclude seconds
-        if minutes > 0 {
-            let hours = minutes / 60
-            let mins = minutes % 60
+        if isCompleted {
+            let minutes = overTimeSeconds / 60
+            let seconds = overTimeSeconds % 60
             
-            if hours > 0 {
-                // Format as "Xh Ym"
-                return String(format: "%dh %dm", hours, mins)
+            // If overtime is more than a minute
+            if minutes > 0 {
+                let hours = minutes / 60
+                let mins = minutes % 60
+                
+                if hours > 0 {
+                    // Format as "Xh Ym"
+                    return String(format: "+%dh %dm", hours, mins)
+                } else {
+                    // Just show minutes
+                    return String(format: "+%dm", mins)
+                }
             } else {
-                // Just show minutes
-                return String(format: "%dm", mins)
+                // For less than a minute, show seconds
+                return String(format: "+%ds", seconds)
             }
         } else {
-            // For less than a minute, show seconds
-            return String(format: "%ds", seconds)
+            let minutes = remainingSeconds / 60
+            let seconds = remainingSeconds % 60
+            
+            // If time is more than a minute, exclude seconds
+            if minutes > 0 {
+                let hours = minutes / 60
+                let mins = minutes % 60
+                
+                if hours > 0 {
+                    // Format as "Xh Ym"
+                    return String(format: "%dh %dm", hours, mins)
+                } else {
+                    // Just show minutes
+                    return String(format: "%dm", mins)
+                }
+            } else {
+                // For less than a minute, show seconds
+                return String(format: "%ds", seconds)
+            }
         }
     }
     
