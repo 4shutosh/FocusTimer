@@ -155,7 +155,7 @@ struct MenuBarView: View {
                     Spacer()
                     
                     Button("Start") {
-                        timerManager.startNewTimer(name: newTimerName, minutes: totalMinutes)
+                        timerManager.startNewTimerAndCloseMenu(name: newTimerName, minutes: totalMinutes)
                     }
                     .frame(width: 55)
                     .disabled(totalMinutes <= 0)
@@ -217,7 +217,12 @@ struct MenuBarView: View {
                         }
                         
                         Button(action: {
-                            timerManager.toggleFloatingWindow()
+                            if !timerManager.showFloatingTimer {
+                                timerManager.toggleFloatingWindow()
+                                NSMenu.dismissActiveMenu()
+                            } else {
+                                timerManager.toggleFloatingWindow()
+                            }
                         }) {
                             Image(systemName: timerManager.showFloatingTimer ? "rectangle.on.rectangle.slash" : "rectangle.on.rectangle")
                         }
@@ -242,7 +247,12 @@ struct MenuBarView: View {
                         .foregroundColor(.secondary)
                     Spacer()
                     Button(action: {
-                        timerManager.toggleFloatingWindow()
+                        if !timerManager.showFloatingTimer {
+                            timerManager.toggleFloatingWindow()
+                            NSMenu.dismissActiveMenu()
+                        } else {
+                            timerManager.toggleFloatingWindow()
+                        }
                     }) {
                         Image(systemName: "rectangle.on.rectangle.slash")
                     }
@@ -282,7 +292,7 @@ struct MenuBarView: View {
                                 }
                                 
                                 Button("Start") {
-                                    timerManager.startNewTimer(name: timer.name, minutes: timer.minutes)
+                                    timerManager.startNewTimerAndCloseMenu(name: timer.name, minutes: timer.minutes)
                                 }
                                 .buttonStyle(.borderless)
                                 .disabled(timerManager.isRunning)
@@ -298,7 +308,7 @@ struct MenuBarView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 if !timerManager.isRunning {
-                                    timerManager.startNewTimer(name: timer.name, minutes: timer.minutes)
+                                    timerManager.startNewTimerAndCloseMenu(name: timer.name, minutes: timer.minutes)
                                 }
                             }
                             .padding(.horizontal)

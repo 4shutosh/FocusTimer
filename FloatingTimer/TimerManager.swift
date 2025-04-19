@@ -60,6 +60,14 @@ class TimerManager: ObservableObject {
         createAndShowFloatingWindow()
     }
     
+    func startNewTimerAndCloseMenu(name: String, minutes: Int) {
+        // Start timer as usual
+        startNewTimer(name: name, minutes: minutes)
+        
+        // Dismiss the menu
+        NSMenu.dismissActiveMenu()
+    }
+    
     func toggleTimer() {
         if isPaused {
             resumeTimer()

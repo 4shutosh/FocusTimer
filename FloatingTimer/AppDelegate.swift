@@ -17,3 +17,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 }
+
+// Extension to provide menu dismissal functionality
+extension NSMenu {
+    static func dismissActiveMenu() {
+        NSApp.mainMenu?.cancelTracking()
+        NSApp.windows.forEach { window in
+            if window.className.contains("MenuBarExtraWindow") {
+                window.close()
+            }
+        }
+    }
+}
