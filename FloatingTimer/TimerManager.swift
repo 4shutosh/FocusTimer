@@ -27,7 +27,7 @@ class TimerManager: ObservableObject {
     private var floatingWindow: NSWindow?
     private var player: AVAudioPlayer?
     
-    private let timerOvertimeThreshold = 30 // 5 minutes in seconds
+    private let timerOvertimeThreshold = 300 // 5 minutes in seconds
     
     var progress: Double {
         if totalSeconds == 0 { return 0 }
