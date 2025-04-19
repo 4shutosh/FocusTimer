@@ -26,4 +26,4 @@ A PIP style timer window for macOS, inspired from sunsama.
 --- 
 
 ### Demo
-![video](/demo.mp4)
+![video](https://github.com/4shutosh/FocusTimer/raw/refs/heads/main/demo.mp4)
