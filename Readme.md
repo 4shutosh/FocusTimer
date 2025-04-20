@@ -33,4 +33,3 @@ A PIP style timer window for macOS, inspired from sunsama.
 ### Demo
 
 ![Demo Video](demo.mp4)
-$$
