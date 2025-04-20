@@ -18,7 +18,7 @@ A PIP style timer window for macOS, inspired from sunsama.
 
 ### How to use?
 
-- Download the latest version from [here](https://github.com/4shutosh/FocusTimer/releases/download/v1.0/FloatingTimer.v1.zip).
+- Download the latest version from [here](https://github.com/4shutosh/FocusTimer/releases/download/v1.0/FloatingTimer_v1.zip).
 - Extract & Drop it into your Applications folder
 - Open it
 - If you see a warning about "app cannot be opened because it is from an unidentified developer":
